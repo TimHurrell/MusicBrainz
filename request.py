@@ -1,38 +1,65 @@
 import requests
 import json
-brainstring1 = 'http://musicbrainz.org/ws/2/release/?query=artist:'
+import sys
 
-artist = input("Enter artist/ band name....   ")
-print("You have entered " + artist)
-#artist = 'Love'
-brainstring2 = ';fmt=json;limit=100'
-brainstring = brainstring1 + artist + brainstring2
-response = requests.get(brainstring)
-albumstring = ''
-yearstring = ''
-for data in response.json()['releases']:
-      try:
-           if data['release-group']['primary-type'] == "Album" and data['status'] == "Official":
-                 albumstring = albumstring + data['title'] + "--"
-                 yearstring = yearstring + data['date'][0:4] + "--"
-#                 break
-      except Exception as e:
-            a = 1
+def GetResponseData():
+     brainstring1 = 'http://musicbrainz.org/ws/2/release/?query=artist:'
+     artist = input("Enter artist/ band name....   ")
+     print("You have entered " + artist)
+     brainstring2 = ';fmt=json;limit=100'
+     brainstring = brainstring1 + artist + brainstring2
+     response = requests.get(brainstring)
+     return response
 
-#      if data['release-group']['primary-type'] == "Album" and data['status'] == "Official":
-#            albumstring = albumstring + data['title'] + "--"
-#            yearstring = yearstring + data['date'][0:4] + "--"     
+def RemoveFinalNCharactersFromStringEnd(TextString,n):
+    TextString = TextString[0:-n]
+    return TextString
 
-yearstring = yearstring[0:-2]
-albumstring = albumstring[0:-2]
-yearlist = list(yearstring.split('--'))
-albumlist = list(albumstring.split('--'))
-zipped_list = (sorted(list(zip(albumlist, yearlist)), key=lambda x: x[1], reverse = True))
-#for data, count in enumerate(zipped_list):
-#      if count <= 10:
-#           print (data[0] + ' ' + data[1])
-#print (albumstring)
-for data in (zipped_list[0:10]):
+
+def GetYearFromDate(date):
+    Year = date[0:4]
+    return Year
+
+
+def GetAlbumDataAsString(response): 
+      albumstring = ''
+      yearstring = ''
+      a = 0
+      for data in response.json()['releases']:
+            a = a + 1
+            try:
+                 if data['release-group']['primary-type'] == "Album" and data['status'] == "Official":
+                        albumstring = albumstring + data['title'] + "--"
+                        yearstring = yearstring + GetYearFromDate(data['date']) + "--"
+            #except Exception as e:
+            except KeyError:       
+                 print ("record ", a, "keyerror")
+
+      return yearstring, albumstring
+
+
+def GetListFromTextString(Textstring,delimiter):
+    newlist = list(Textstring.split(delimiter))
+    return newlist
+
+
+def ZipListsAndSortOnColumn(List1,List2,n,sorttype):
+    zipped_list = (sorted(list(zip(List1, List2)), key=lambda x: x[n], reverse = sorttype))
+    return zipped_list
+
+
+
+response = GetResponseData() 
+yearstring, albumstring = GetAlbumDataAsString(response)
+yearstring = RemoveFinalNCharactersFromStringEnd(yearstring,2)
+albumstring = RemoveFinalNCharactersFromStringEnd(albumstring,2)
+yearlist = GetListFromTextString(yearstring,'--')
+albumlist = GetListFromTextString(albumstring,'--')
+zipped_list = ZipListsAndSortOnColumn(albumlist, yearlist,1,True)
+
+
+ITERATION_LIMIT = 10
+for data in (zipped_list[0:ITERATION_LIMIT]):
            print (data[0] + ' ' + data[1])
 
 
