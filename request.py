@@ -2,12 +2,18 @@ import requests
 import json
 import sys
 
-def GetResponseData():
-     brainstring1 = 'http://musicbrainz.org/ws/2/release/?query=artist:'
+def GetInputData():
      artist = input("Enter artist/ band name....   ")
      print("You have entered " + artist)
-     brainstring2 = ';fmt=json;limit=100'
-     brainstring = brainstring1 + artist + brainstring2
+     return artist
+
+
+def GetUrlForWebsite(artist):
+     brainstring = (f'http://musicbrainz.org/ws/2/release/?query=artist:{artist};fmt=json;limit=100')
+     return brainstring
+
+
+def GetResponseDataFromWebSite(brainstring):
      response = requests.get(brainstring)
      return response
 
@@ -31,9 +37,8 @@ def GetAlbumDataAsString(response):
                  if data['release-group']['primary-type'] == "Album" and data['status'] == "Official":
                         albumstring = albumstring + data['title'] + "--"
                         yearstring = yearstring + GetYearFromDate(data['date']) + "--"
-            #except Exception as e:
             except KeyError:       
-                 print ("record ", a, "keyerror")
+                 print ("record number", a, "keyerror in returned data")
 
       return yearstring, albumstring
 
@@ -48,11 +53,14 @@ def ZipListsAndSortOnColumn(List1,List2,n,sorttype):
     return zipped_list
 
 
-
-response = GetResponseData() 
+artist = GetInputData() 
+brainstring = GetUrlForWebsite(artist) 
+response = GetResponseDataFromWebSite(brainstring)
 yearstring, albumstring = GetAlbumDataAsString(response)
+
 yearstring = RemoveFinalNCharactersFromStringEnd(yearstring,2)
 albumstring = RemoveFinalNCharactersFromStringEnd(albumstring,2)
+
 yearlist = GetListFromTextString(yearstring,'--')
 albumlist = GetListFromTextString(albumstring,'--')
 zipped_list = ZipListsAndSortOnColumn(albumlist, yearlist,1,True)
