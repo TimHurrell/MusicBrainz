@@ -14,6 +14,7 @@ def GetUrlForWebsite(artist):
 
 
 def GetResponseDataFromWebSite(brainstring):
+
      response = requests.get(brainstring)
      return response
 
@@ -33,12 +34,16 @@ def GetAlbumDataAsString(response):
       a = 0
       for data in response.json()['releases']:
             a = a + 1
+            release_status = data.get('status')
+            release_title = data.get('title')
+            release_date = data.get('date')
+            release_type = data['release-group'].get('primary-type')
             try:
-                 if data['release-group']['primary-type'] == "Album" and data['status'] == "Official":
-                        albumstring = albumstring + data['title'] + "--"
-                        yearstring = yearstring + GetYearFromDate(data['date']) + "--"
-            except KeyError:       
-                 print ("record number", a, "keyerror in returned data")
+                if release_type == "Album" and release_status == "Official":
+                    albumstring = albumstring + release_title + "--"
+                    yearstring = yearstring + release_date + "--"
+            except Exception as e:       
+                 print (f'exception error {e} ')
 
       return yearstring, albumstring
 
