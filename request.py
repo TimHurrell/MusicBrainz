@@ -18,62 +18,81 @@ def GetResponseDataFromWebSite(brainstring):
      response = requests.get(brainstring)
      return response
 
-def RemoveFinalNCharactersFromStringEnd(TextString,n):
-    TextString = TextString[0:-n]
-    return TextString
-
-
-def GetYearFromDate(date):
-    Year = date[0:4]
-    return Year
-
-
 def GetAlbumDataAsString(response): 
-      albumstring = ''
-      yearstring = ''
-      a = 0
+      albumlist2 = []
       for data in response.json()['releases']:
-            a = a + 1
             release_status = data.get('status')
             release_title = data.get('title')
             release_date = data.get('date')
             release_type = data['release-group'].get('primary-type')
+            if release_title is None:
+                 release_title = 'Nonetype'
+            if release_date is None or not release_date:
+                 release_date = 'Nonetype'
+
             try:
                 if release_type == "Album" and release_status == "Official":
-                    albumstring = albumstring + release_title + "--"
-                    yearstring = yearstring + release_date + "--"
+                    album = myAlbum()
+                    album.artist = artist
+                    album.albumname = release_title
+                    album.yearofrelease = release_date[0:4]
+                    if not release_date == 'Nonetype':
+                         albumlist2.append(album)                  
             except Exception as e:       
                  print (f'exception error {e} ')
+      
 
-      return yearstring, albumstring
+      sort_list = SortAlbumArray(albumlist2, False)
+      removed_releases = RemoveRereleases(sort_list)
+      resort_list = SortAlbumArray(removed_releases, True)
+
+      ITERATION_LIMIT = 10
+      resort_list2 = resort_list[0:ITERATION_LIMIT]
+      return resort_list2
+
+def SortAlbumArray(albumlist,sorttype):
+    sort_list = sorted((albumlist), key=lambda x: x.yearofrelease, reverse = sorttype)
+    return sort_list
+
+
+def RemoveRereleases(albumlist):
+    for release in albumlist:
+         testalbum = release.albumname
+         count = 0
+         for release2 in albumlist:
+              testalbum2 = release2.albumname
+              if testalbum == testalbum2:
+                   count = count + 1
+                   if count == 2:
+                        print ("removed ", release2.albumname, release2.yearofrelease)
+                        albumlist.remove(release2)
+                        count = 1
+    return albumlist
 
 
 def GetListFromTextString(Textstring,delimiter):
     newlist = list(Textstring.split(delimiter))
     return newlist
 
+class myAlbum:
+    artist = "artist"
+    albumname = "album"
+    yearofrelease = 1800
 
-def ZipListsAndSortOnColumn(List1,List2,n,sorttype):
-    zipped_list = (sorted(list(zip(List1, List2)), key=lambda x: x[n], reverse = sorttype))
-    return zipped_list
+    def description(self):
+         print (f'{self.artist} released {self.albumname} in {self.yearofrelease}')
 
 
 artist = GetInputData() 
 brainstring = GetUrlForWebsite(artist) 
 response = GetResponseDataFromWebSite(brainstring)
-yearstring, albumstring = GetAlbumDataAsString(response)
-
-yearstring = RemoveFinalNCharactersFromStringEnd(yearstring,2)
-albumstring = RemoveFinalNCharactersFromStringEnd(albumstring,2)
-
-yearlist = GetListFromTextString(yearstring,'--')
-albumlist = GetListFromTextString(albumstring,'--')
-zipped_list = ZipListsAndSortOnColumn(albumlist, yearlist,1,True)
+album_list = GetAlbumDataAsString(response)
 
 
-ITERATION_LIMIT = 10
-for data in (zipped_list[0:ITERATION_LIMIT]):
-           print (data[0] + ' ' + data[1])
+print('\n\n\nTen most recent album releases are ....')
+for obj in album_list:
+     obj.description()
+
 
 
 
