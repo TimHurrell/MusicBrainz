@@ -1,6 +1,10 @@
 
 #Ten most recent releases (excluding re-releases)
 
+Wont run as described currently below as refactoring
+
+
+
 request.py prompts user for artist name  
 and prints out the latest 10 official album releases  
 

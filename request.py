@@ -2,15 +2,15 @@ import requests
 import json
 import sys
 
-def GetInputData():
-     artist = input("Enter artist/ band name....   ")
-     print("You have entered " + artist)
-     return artist
+#def GetInputData():
+ #    artist = input("Enter artist/ band name....   ")
+  #   print("You have entered " + artist)
+   #  return artist
 
 
-def GetUrlForWebsite(artist):
-     brainstring = (f'http://musicbrainz.org/ws/2/release/?query=artist:{artist};fmt=json;limit=100')
-     return brainstring
+#def GetUrlForWebsite(artist):
+ #    brainstring = (f'http://musicbrainz.org/ws/2/release/?query=artist:{artist};fmt=json;limit=100')
+  #   return brainstring
 
 
 def GetResponseDataFromWebSite(brainstring):
@@ -51,8 +51,7 @@ def GetAlbumDataAsString(response):
       return resort_list2
 
 def SortAlbumArray(albumlist,sorttype):
-    sort_list = sorted((albumlist), key=lambda x: x.yearofrelease, reverse = sorttype)
-    return sort_list
+    return sorted((albumlist), key=lambda x: x.yearofrelease, reverse = sorttype)
 
 
 def RemoveRereleases(albumlist):
@@ -74,7 +73,38 @@ def GetListFromTextString(Textstring,delimiter):
     newlist = list(Textstring.split(delimiter))
     return newlist
 
+
+
+
+class myEntry:
+    def __init__(self):
+         self.artist = input('Enter name of artist/ band:  ')
+
+    def description(self):
+         print (f'/n/n You have selected {self.artist}')
+
+
+
+class myCreateUrl:
+    def __init__(self,artist):
+         self.url = (f'http://musicbrainz.org/ws/2/release/?query=artist:{artist};fmt=json;limit=100')
+
+
+    def description(self):
+         print (f'URL is {self.url}')
+
+
+class myResponse:
+    def __init__(self,url):
+         self.response = requests.get(url)
+
+
+    def description(self):
+         print (f'{self.response}')
+
+
 class myAlbum:
+
     artist = "artist"
     albumname = "album"
     yearofrelease = 1800
@@ -83,15 +113,25 @@ class myAlbum:
          print (f'{self.artist} released {self.albumname} in {self.yearofrelease}')
 
 
-artist = GetInputData() 
-brainstring = GetUrlForWebsite(artist) 
-response = GetResponseDataFromWebSite(brainstring)
-album_list = GetAlbumDataAsString(response)
+
+bandname = myEntry()
+bandname.description()
+
+bandurl = myCreateUrl(bandname.artist)
+bandurl.description()
+
+response = myResponse(bandurl.url)
+response.description()
+
+#artist = GetInputData() 
+#brainstring = GetUrlForWebsite(artist) 
+#response = GetResponseDataFromWebSite(brainstring)
+#album_list = GetAlbumDataAsString(response)
 
 
-print('\n\n\nTen most recent album releases are ....')
-for obj in album_list:
-     obj.description()
+#print('\n\n\nTen most recent album releases are ....')
+#for obj in album_list:
+#     obj.description()
 
 
 
