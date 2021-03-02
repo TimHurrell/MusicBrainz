@@ -94,7 +94,7 @@ class myCreateUrl:
          print (f'URL is {self.url}')
 
 
-class myResponse:
+class myResponseFromWebSite:
     def __init__(self,url):
          self.response = requests.get(url)
 
@@ -113,25 +113,87 @@ class myAlbum:
          print (f'{self.artist} released {self.albumname} in {self.yearofrelease}')
 
 
+class myGetRequiredQueryDataFromJson:
+
+     def __init__(self,jsondata):
+         self.status = jsondata.get('status')
+         self.title = jsondata.get('title')
+         self.date = jsondata.get('date')
+         self.type = jsondata['release-group'].get('primary-type')
+
+         if self.title is None:
+             self.title = 'Nonetype'
+         if self.date is None or not self.date:
+             self.date = 'Nonetype'
+
+
+     def description(self):
+         print (f'{self.status} {self.title} {self.date} {self.type}')
+
+
+class myRelease:
+
+     def __init__(self,artist,release_title,release_date):
+         self.artist = artist
+         self.title = release_title
+         self.yearofrelease = release_date
+
+     def description(self):
+         print (f'{self.artist} released {self.title} in {self.yearofrelease}')
+
+
+class myRequiredData:
+     def __init__(self,releasetype,releasestatus,releaseyear):
+         self.filter = False
+         if releasetype == "Album" and releasestatus == "Official" and not releaseyear == 'Nonetype':
+             self.filter = True
+     def description(self):
+         print (f'{self.filter}')
+
+
+class myReleaseList:
+     def __init__(self,releaselist,release):
+         self.releaselist.append(release)
+
+   
+
+def GetAlbumDataAsString2(artist,response): 
+     albumlist2 = []
+     for data in response.json()['releases']:
+            releasedata = myGetRequiredQueryDataFromJson(data)
+            releasedata.description()
+            try:
+                #if releasedata.type == "Album" and releasedata.status == "Official":
+                releasefilter = myRequiredData(releasedata.type,releasedata.status,releasedata.date)
+                releasefilter.description()
+                if releasefilter.filter == True:
+                    releasedata.description()
+                    album = myRelease(artist,releasedata.title,releasedata.date)
+                    #if not releasedata.date == 'Nonetype':
+                    albumlist2.append(album)                  
+            except Exception as e:       
+                 print (f'exception error {e} ')
+     return albumlist2
 
 bandname = myEntry()
 bandname.description()
 
 bandurl = myCreateUrl(bandname.artist)
-bandurl.description()
+#bandurl.description()
 
-response = myResponse(bandurl.url)
-response.description()
+webresponse = myResponseFromWebSite(bandurl.url)
+#webresponse.description()
 
 #artist = GetInputData() 
 #brainstring = GetUrlForWebsite(artist) 
 #response = GetResponseDataFromWebSite(brainstring)
-#album_list = GetAlbumDataAsString(response)
+album_list = GetAlbumDataAsString2(bandname.artist,webresponse.response)
 
 
-#print('\n\n\nTen most recent album releases are ....')
-#for obj in album_list:
-#     obj.description()
+
+print('\n\n\nTen most recent album releases are ....')
+for obj in album_list:
+    obj.description()
 
 
 
