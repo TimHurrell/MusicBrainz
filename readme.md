@@ -1,8 +1,8 @@
 
 #Ten most recent releases (excluding re-releases)
 
-Wont run as described currently below as refactoring
 
+Now creating a test environment so main file is in subfolder
 
 
 request.py prompts user for artist name  
@@ -10,7 +10,7 @@ and prints out the latest 10 official album releases
 
 To run you need to have pip installed the request package  
 
-then run "py request.py"  
+then run "py __init__.py"  
 
 ##Please note
    i) There are exceptions that are currently passed without investigation  

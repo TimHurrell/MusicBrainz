@@ -77,7 +77,6 @@ class myReleaseList:
           self.releaselist = []
           for data in response.json()['releases']:
                releasedata = myGetRequiredQueryDataFromJson(data)
-               #releasedata = myGetRequiredQueryDataFromJson.myadjustforexceptions(releasedata)
                try:
                     releasefilter = myRequiredData(releasedata.type,releasedata.status,releasedata.date)
                     if releasefilter.filter == True:
@@ -95,28 +94,8 @@ class myReleaseList:
          sorted((self.releaselist), key=lambda x: x.yearofrelease, reverse = False)
          
 
-  
-
-
-bandname = myEntry()
-bandname.description()
-
-bandurl = myCreateUrl(bandname.artist)
-#bandurl.description()
-
-webresponse = myResponseFromWebSite(bandurl.url)
-#webresponse.description()
-
-#artist = GetInputData() 
-#brainstring = GetUrlForWebsite(artist) 
-#response = GetResponseDataFromWebSite(brainstring)
-album_list = myReleaseList(bandname.artist,webresponse.response)
-
-
 def SortAlbumArray(albumlist,sorttype):
     return sorted((albumlist), key=lambda x: x.yearofrelease, reverse = sorttype)
-
-
 
 
 def RemoveRereleases(albumlist):
@@ -138,27 +117,25 @@ def Rereleases(albumlist):
     for release in albumlist:
          print (release)
 
-         
-
-sorted_album_list = SortAlbumArray(album_list.releaselist,False)
-removed_album_list = RemoveRereleases(sorted_album_list)
-sorted_album_list = SortAlbumArray(removed_album_list,True)
 
 
-print('\nTen most recent album releases are ....')
-for obj in sorted_album_list:
-    obj.description()
+def main():    
+    bandname = myEntry()
+    bandname.description()
+    bandurl = myCreateUrl(bandname.artist)
+    webresponse = myResponseFromWebSite(bandurl.url)
+    album_list = myReleaseList(bandname.artist,webresponse.response)                
+    sorted_album_list = SortAlbumArray(album_list.releaselist,False)
+    removed_album_list = RemoveRereleases(sorted_album_list)
+    sorted_album_list = SortAlbumArray(removed_album_list,True)
+    
+    print('\nTen most recent album releases are ....')
+    for obj in sorted_album_list:
+        obj.description()
 
 
-
-
-
-
-
-def GetListFromTextString(Textstring,delimiter):
-    newlist = list(Textstring.split(delimiter))
-    return newlist
-
+if __name__ == "__main__":
+    main()
 
 
 
