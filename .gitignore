@@ -1,2 +1,4 @@
 qlog
 /OLD
+/__pycache__
+/Scraping/__pycache__
